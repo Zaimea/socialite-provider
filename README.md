@@ -39,16 +39,3 @@ For issues or suggestions: [GitHub Issues](https://github.com/zaimea/socialite-p
 ## License
 
 Zaimea Socialite Provider is open-sourced software licensed under the [MIT license](LICENSE).
-
-
-```php
-<?php
-return [
-    'client_id' => env('ZAIMEA_CLIENT_ID'),
-    'client_secret' => env('ZAIMEA_CLIENT_SECRET'),
-    'redirect' => env('ZAIMEA_REDIRECT_URI'),
-    'pkce' => env('ZAIMEA_PKCE', true),
-    'scopes' => env('ZAIMEA_SCOPES', 'openid profile email')
-];
-```
-
