@@ -1,6 +1,7 @@
 - ## Getting Started
-    - [Install](/docs/accounts/{{version}}/installation)
-    - [Changelog](/docs/accounts/{{version}}/changelog)
+    - [Install](/docs/socialite-provider/{{version}}/installation)
+    - [Changelog](/docs/socialite-provider/{{version}}/changelog)
 
-- ## Commonmark Blade Render Usage
-    - [Usage](/docs/accounts/{{version}}/usage)
+- ## Socialite Provider Usage
+    - [Usage](/docs/socialite-provider/{{version}}/usage)
+    - [Examples](/docs/socialite-provider/{{version}}/examples)

@@ -14,7 +14,7 @@
 
 ## Introduction
 
-``Zaimea Socialite Provider`` .
+``Zaimea Socialite Provider`` is a custom Socialite provider which allows your Laravel applications to authenticate users through **accounts.zaimea.com**.
 
 ## Official Documentation
 

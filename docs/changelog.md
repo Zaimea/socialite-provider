@@ -1,7 +1,10 @@
 ---
 title: Notable changes
 description: Notable changes
-github: https://github.com/zaimea/accounts-sdk-laravel/edit/main/docs/
+github: https://github.com/zaimealabs/aggregate/edit/main/docs/
+onThisArticle: false
+sidebar: true
+rightbar: false
 ---
 
-All notable changes to `accounts-sdk-laravel` are documented [on GitHub](https://github.com/zaimea/accounts-sdk-laravel/blob/main/CHANGELOG.md)
+All notable changes to `socialite-provider` are documented [on GitHub](https://github.com/zaimea/socialite-provider/blob/main/CHANGELOG.md)
