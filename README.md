@@ -1,7 +1,7 @@
 <p align="center"><img src=".github/logo.svg" alt="Zaimea Provider" width="300">
 
 <p align="center">
-    <a href="https://github.com/zaimea/socialite-provider/actions"><img src="https://github.com/zaimea/socialite-provider/actions/workflows/tests/badge.svg" alt="Build Status"></a>
+    <a href="https://github.com/zaimea/socialite-provider/actions"><img src="https://github.com/zaimea/socialite-provider/actions/workflows/tests.yml/badge.svg" alt="Build Status"></a>
     <a href="https://packagist.org/packages/zaimea/socialite-provider"><img src="https://img.shields.io/packagist/dt/zaimea/socialite-provider" alt="Total Downloads"></a>
     <a href="https://packagist.org/packages/zaimea/socialite-provider"><img src="https://img.shields.io/packagist/v/zaimea/socialite-provider" alt="Latest Stable Version"></a>
     <a href="https://packagist.org/packages/zaimea/socialite-provider"><img src="https://img.shields.io/packagist/l/zaimea/socialite-provider" alt="License"></a>
