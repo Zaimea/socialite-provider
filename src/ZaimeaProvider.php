@@ -37,9 +37,18 @@ class ZaimeaProvider extends AbstractProvider
     {
         $url = $this->buildAuthUrlFromBase($this->baseUrl.'/oauth/authorize', $state);
 
+        $params = [
+            'response_type' => 'code',
+            'client_id' => $this->clientId,
+            'redirect_uri' => $this->redirectUrl,
+            'state' => $state,
+        ];
+
+        $scopes = $this->scopes ?: [''];
+        $params['scope'] = implode($this->scopeSeparator, $scopes);
+
         // if PKCE enabled, append code_challenge fields; the AbstractProvider's getCodeVerifier
         // returns null by default — we override getCodeVerifier() via trait below if needed.
-        $params = [];
         if (! empty($this->driverConfig['pkce'])) {
             $verifier = $this->getCodeVerifier();
             if ($verifier) {
