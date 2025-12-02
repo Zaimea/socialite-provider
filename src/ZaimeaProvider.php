@@ -14,12 +14,15 @@ class ZaimeaProvider extends AbstractProvider
     protected string $baseUrl = '';
     protected array $driverConfig = [];
 
+    protected string $version = '';
+
     public function __construct(Request $request, $clientId, $clientSecret, $redirectUrl = null, ?ClientInterface $guzzle = null, array $driverConfig = [])
     {
         parent::__construct($request, $clientId, $clientSecret, $redirectUrl);
 
         $this->baseUrl = rtrim('https://accounts.zaimea.com', '/');
         $this->driverConfig = $driverConfig ?: config('services.zaimea');
+        $this->version = $this->driverConfig['version'];
 
         if ($guzzle) {
             $this->setHttpClient($guzzle);
@@ -32,7 +35,7 @@ class ZaimeaProvider extends AbstractProvider
 
     protected function getAuthUrl($state)
     {
-        $url = $this->buildAuthUrlFromBase($this->baseUrl.'/oauth/authorize', $state);
+        $url = $this->buildAuthUrlFromBase(rtrim($this->baseUrl, '/') . "/api/{$this->version}/oauth/authorize", $state);
 
         // if PKCE enabled, append code_challenge fields; the AbstractProvider's getCodeVerifier
         // returns null by default — we override getCodeVerifier() via trait below if needed.
@@ -54,12 +57,16 @@ class ZaimeaProvider extends AbstractProvider
 
     protected function getTokenUrl()
     {
-        return $this->baseUrl.'/oauth/token';
+        $url = rtrim($this->baseUrl, '/') . "/api/{$this->version}/oauth/token";
+
+        return $url;
     }
 
     public function getUserByToken($token)
     {
-        $response = $this->getHttpClient()->get($this->baseUrl.'/api/user', [
+        $url = rtrim($this->baseUrl, '/') . "/api/{$this->version}/auth/user";
+
+        $response = $this->getHttpClient()->get($url, [
             'headers' => [
                 'Authorization' => 'Bearer '.$token,
                 'Accept' => 'application/json',
@@ -68,7 +75,7 @@ class ZaimeaProvider extends AbstractProvider
 
         $body = json_decode((string) $response->getBody(), true);
 
-        return $body['user'] ?? $body;
+        return $body['user'] ?? $body['data'] ?? $body;
     }
 
     protected function mapUserToObject(array $user)
