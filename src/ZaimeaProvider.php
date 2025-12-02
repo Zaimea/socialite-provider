@@ -35,7 +35,7 @@ class ZaimeaProvider extends AbstractProvider
 
     protected function getAuthUrl($state)
     {
-        $url = $this->buildAuthUrlFromBase(rtrim($this->baseUrl, '/') . "/api/{$this->version}/oauth/authorize", $state);
+        $url = $this->buildAuthUrlFromBase($this->baseUrl.'/oauth/authorize', $state);
 
         // if PKCE enabled, append code_challenge fields; the AbstractProvider's getCodeVerifier
         // returns null by default — we override getCodeVerifier() via trait below if needed.
@@ -57,9 +57,7 @@ class ZaimeaProvider extends AbstractProvider
 
     protected function getTokenUrl()
     {
-        $url = rtrim($this->baseUrl, '/') . "/api/{$this->version}/oauth/token";
-
-        return $url;
+        return $this->baseUrl.'/oauth/token';
     }
 
     public function getUserByToken($token)
