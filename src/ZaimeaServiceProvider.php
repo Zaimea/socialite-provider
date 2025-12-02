@@ -4,7 +4,7 @@ namespace Zaimea\Socialite;
 
 use Illuminate\Support\ServiceProvider;
 use Laravel\Socialite\SocialiteManager;
-use Zaimea\Socialite\ZaimeaProvider;
+use Zaimea\Socialite\Providers\ZaimeaProvider;
 
 class ZaimeaServiceProvider extends ServiceProvider
 {
