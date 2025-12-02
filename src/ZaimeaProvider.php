@@ -10,7 +10,7 @@ use Laravel\Socialite\Two\User;
 class ZaimeaProvider extends AbstractProvider
 {
     protected $scopeSeparator = ' ';
-    protected $scopes = ['openid', 'profile', 'email'];
+    protected $scopes = ['user'];
     protected string $baseUrl = '';
     protected array $driverConfig = [];
 
