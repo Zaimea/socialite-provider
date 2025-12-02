@@ -2,7 +2,7 @@
 
 namespace Zaimea\Socialite\Providers;
 
-use App\Http\Requests\Request;
+use Illuminate\Http\Request;
 use GuzzleHttp\ClientInterface;
 use Laravel\Socialite\Two\AbstractProvider;
 use Laravel\Socialite\Two\User;
