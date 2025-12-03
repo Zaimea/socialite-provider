@@ -3,35 +3,25 @@
 namespace Zaimea\Socialite;
 
 use Illuminate\Support\ServiceProvider;
-use Laravel\Socialite\SocialiteManager;
+use Laravel\Socialite\Contracts\Factory as SocialiteFactory;
 use Zaimea\Socialite\Providers\ZaimeaProvider;
 
 class ZaimeaServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
-     */
-    public function register()
-    {
-        //
-    }
-
-    /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
-        $this->app->resolving(SocialiteManager::class, function ($manager) {
-            $manager->extend('zaimea', function ($app) use ($manager) {
-                $config = $app['config']->get('services.zaimea');
+        $this->app->resolving(SocialiteFactory::class, function ($socialite) {
+            $socialite->extend('zaimea', function ($app) {
+                $config = $app['config']['services.zaimea'];
+
                 return new ZaimeaProvider(
                     $app['request'],
                     $config['client_id'],
                     $config['client_secret'],
                     $config['redirect'],
-                    null,
                     $config
                 );
             });

@@ -17,7 +17,7 @@ class ZaimeaProvider extends AbstractProvider
     /**
      * Scopes
      */
-    protected $scopes = ['user'];
+    protected $scopes = ['user', 'group'];
 
     /**
      * Base URL for OAuth
