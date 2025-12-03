@@ -3,97 +3,78 @@
 namespace Zaimea\Socialite\Providers;
 
 use GuzzleHttp\RequestOptions;
-use Illuminate\Http\Request;
 use Laravel\Socialite\Two\AbstractProvider;
+use Laravel\Socialite\Two\ProviderInterface;
 use Laravel\Socialite\Two\User;
 
-class ZaimeaProvider extends AbstractProvider
+class ZaimeaProvider extends AbstractProvider implements ProviderInterface
 {
     /**
-     * The base URL for Zaimea Accounts API.
-     */
-    protected string $baseUrl = 'https://accounts.zaimea.com';
-
-    /**
-     * The API version.
-     */
-    protected string $version = 'v1';
-
-    /**
      * The scopes being requested.
+     *
+     * @var array
      */
-    protected $scopes = ['user', 'group'];
+    protected $scopes = ['user'];
 
     /**
-     * Constructor.
+     * {@inheritdoc}
      */
-    public function __construct(Request $request, string $clientId, string $clientSecret, string $redirect, array $config = [])
+    protected function getAuthUrl($state)
     {
-        parent::__construct($request, $clientId, $clientSecret, $redirect);
-
-        if (!empty($config['base_url'])) {
-            $this->baseUrl = rtrim($config['base_url'], '/');
-        }
-
-        $this->version = $config['version'] ?? $this->version;
-
-        if (!empty($config['scopes'])) {
-            $this->scopes = explode(' ', $config['scopes']);
-        }
+        return $this->buildAuthUrlFromBase('https://accounts.zaimea.com/oauth/authorize', $state);
     }
 
     /**
-     * Get the authentication URL for the provider.
+     * {@inheritdoc}
      */
-    protected function getAuthUrl($state): string
+    protected function getTokenUrl()
     {
-        return $this->buildAuthUrlFromBase($this->baseUrl . '/oauth/authorize', $state);
+        return 'https://accounts.zaimea.com/oauth/token';
     }
 
     /**
-     * Get the token URL for the provider.
+     * {@inheritdoc}
      */
-    protected function getTokenUrl(): string
+    protected function getUserByToken($token)
     {
-        return $this->baseUrl . '/oauth/token';
+        $userUrl = 'https://accounts.zaimea.com/api/v1/auth/user';
+
+        $response = $this->getHttpClient()->get(
+            $userUrl, $this->getRequestOptions($token)
+        );
+
+        $user = json_decode($response->getBody(), true);
+
+        return $user;
     }
 
     /**
-     * Get the raw user for the given access token.
+     * {@inheritdoc}
      */
-    protected function getUserByToken($token): array
+    protected function mapUserToObject(array $user)
     {
-        $response = $this->getHttpClient()->get($this->baseUrl . "/api/{$this->version}/user", [
+        return (new User)->setRaw($user)->map([
+            'id'       => $user['id'] ?? null,
+            'nickname' => $user['username'] ?? null,
+            'name'     => $user['name'] ?? null,
+            'email'    => $user['email'] ?? null,
+            'avatar'   => $user['profile_photo_url'] ?? null,
+        ]);
+    }
+
+    /**
+     * Get the default options for an HTTP request.
+     *
+     * @param  string  $token
+     * @return array
+     */
+    protected function getRequestOptions($token)
+    {
+        return [
             RequestOptions::HEADERS => [
-                'Authorization' => 'Bearer ' . $token,
                 'Accept' => 'application/json',
+                'Authorization' => 'Bearer '. $token,
             ],
-        ]);
-
-        return json_decode($response->getBody(), true);
-    }
-
-    /**
-     * Map the raw user array to a Socialite User instance.
-     */
-    protected function mapUserToObject(array $user): User
-    {
-        return (new User())->setRaw($user)->map([
-            'id' => $user['id'] ?? null,
-            'nickname' => $user['nickname'] ?? null,
-            'name' => $user['name'] ?? null,
-            'email' => $user['email'] ?? null,
-            'avatar' => $user['avatar'] ?? null,
-        ]);
-    }
-
-    /**
-     * Get the POST fields for the token request.
-     */
-    protected function getTokenFields($code): array
-    {
-        return array_merge(parent::getTokenFields($code), [
-            'grant_type' => 'authorization_code',
-        ]);
+        ];
     }
 }
