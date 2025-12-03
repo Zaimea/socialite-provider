@@ -2,82 +2,56 @@
 
 namespace Zaimea\Socialite\Providers;
 
+use GuzzleHttp\RequestOptions;
 use Illuminate\Http\Request;
-use GuzzleHttp\ClientInterface;
 use Laravel\Socialite\Two\AbstractProvider;
 use Laravel\Socialite\Two\User;
 
 class ZaimeaProvider extends AbstractProvider
 {
     /**
-     * Separator for scopes
+     * The base URL for Zaimea Accounts API.
      */
-    protected $scopeSeparator = ' ';
+    protected string $baseUrl = 'https://accounts.zaimea.com';
 
     /**
-     * Scopes
+     * The API version.
+     */
+    protected string $version = 'v1';
+
+    /**
+     * The scopes being requested.
      */
     protected $scopes = ['user', 'group'];
 
     /**
-     * Base URL for OAuth
+     * Constructor.
      */
-    protected string $baseUrl;
+    public function __construct(Request $request, string $clientId, string $clientSecret, string $redirect, array $config = [])
+    {
+        parent::__construct($request, $clientId, $clientSecret, $redirect);
 
-    /**
-     * Config driver
-     */
-    protected array $driverConfig = [];
-
-    /**
-     * API Version
-     */
-    protected string $version;
-
-    /**
-     * Constructor
-     */
-    public function __construct(
-        Request $request,
-        $clientId,
-        $clientSecret,
-        $redirectUrl = null,
-        ?ClientInterface $guzzle = null,
-        array $driverConfig = []
-    ) {
-        parent::__construct($request, $clientId, $clientSecret, $redirectUrl);
-
-        $this->baseUrl = rtrim('https://accounts.zaimea.com', '/');
-        $this->driverConfig = $driverConfig ?: config('services.zaimea');
-        $this->version = $this->driverConfig['version'] ?? 'v1';
-
-        if ($guzzle) {
-            $this->setHttpClient($guzzle);
+        if (!empty($config['base_url'])) {
+            $this->baseUrl = rtrim($config['base_url'], '/');
         }
 
-        if (!empty($this->driverConfig['scopes'])) {
-            $this->scopes = explode(' ', $this->driverConfig['scopes']);
+        $this->version = $config['version'] ?? $this->version;
+
+        if (!empty($config['scopes'])) {
+            $this->scopes = explode(' ', $config['scopes']);
         }
     }
 
     /**
      * Get the authentication URL for the provider.
-     *
-     * @param  string  $state
-     * @return string
      */
     protected function getAuthUrl($state): string
     {
-        return $this->buildAuthUrlFromBase(
-            $this->baseUrl . '/oauth/authorize',
-            $state
-        );
+        return $this->buildAuthUrlFromBase($this->baseUrl . '/oauth/authorize', $state);
     }
 
     /**
-     * Get the validation URL for the provider.
-     *
-     * @return string
+     * Get the token URL for the provider.
      */
     protected function getTokenUrl(): string
     {
@@ -86,50 +60,40 @@ class ZaimeaProvider extends AbstractProvider
 
     /**
      * Get the raw user for the given access token.
-     *
-     * @param  string  $token
-     * @return array
      */
-    public function getUserByToken($token): mixed
+    protected function getUserByToken($token): array
     {
-        $url = rtrim($this->baseUrl, '/') . "/api/{$this->version}/auth/user";
-
-        $response = $this->getHttpClient()->get($url, [
-            'headers' => [
+        $response = $this->getHttpClient()->get($this->baseUrl . "/api/{$this->version}/user", [
+            RequestOptions::HEADERS => [
                 'Authorization' => 'Bearer ' . $token,
                 'Accept' => 'application/json',
             ],
         ]);
 
-        $body = json_decode((string)$response->getBody(), true);
-
-        return $body['user'] ?? $body['data'] ?? $body;
+        return json_decode($response->getBody(), true);
     }
 
     /**
      * Map the raw user array to a Socialite User instance.
-     *
-     * @param  array  $user
-     * @return User
      */
     protected function mapUserToObject(array $user): User
     {
         return (new User())->setRaw($user)->map([
-            'id' => $user['id'] ?? $user['uuid'] ?? null,
+            'id' => $user['id'] ?? null,
             'nickname' => $user['nickname'] ?? null,
-            'name' => $user['name'] ?? $user['full_name'] ?? null,
+            'name' => $user['name'] ?? null,
             'email' => $user['email'] ?? null,
-            'avatar' => $user['avatar'] ?? $user['profile_photo_url'] ?? null,
+            'avatar' => $user['avatar'] ?? null,
         ]);
     }
 
     /**
-     * Token fields
+     * Get the POST fields for the token request.
      */
     protected function getTokenFields($code): array
     {
-        $fields = parent::getTokenFields($code);
-        $fields['grant_type'] = 'authorization_code';
-        return $fields;
+        return array_merge(parent::getTokenFields($code), [
+            'grant_type' => 'authorization_code',
+        ]);
     }
 }
