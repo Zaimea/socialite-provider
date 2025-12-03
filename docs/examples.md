@@ -17,8 +17,8 @@ rightbar: true
 'zaimea' => [
     'client_id' => env('ZAIMEA_CLIENT_ID'),
     'client_secret' => env('ZAIMEA_CLIENT_SECRET'),
-    'redirect' => env('ZAIMEA_REDIRECT_URI'),
-    'pkce' => true, // optional
+    'redirect' => env('ZAIMEA_REDIRECT', 'http://zaimea.com/auth/callback'),
+    'version' => env('ZAIMEA_VERSION', 'v1'),
 ],
 ```
 
@@ -71,7 +71,7 @@ $refresh = $zaimeaUser->refreshToken;
 
 ```php
 Socialite::driver('zaimea')
-    ->scopes(['openid', 'profile', 'email'])
+    ->scopes(['user'])
     ->redirect();
 ```
 

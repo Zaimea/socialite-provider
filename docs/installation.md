@@ -49,6 +49,7 @@ In `config/services.php`:
     'client_id' => env('ZAIMEA_CLIENT_ID'),
     'client_secret' => env('ZAIMEA_CLIENT_SECRET'),
     'redirect' => env('ZAIMEA_REDIRECT_URI'),
+    'version' => env('ZAIMEA_VERSION', 'v1'),
 ],
 ```
 
@@ -58,4 +59,5 @@ In `config/services.php`:
 ZAIMEA_CLIENT_ID=your_client_id
 ZAIMEA_CLIENT_SECRET=your_client_secret
 ZAIMEA_REDIRECT_URI=https://your-app.com/auth/callback
+ZAIMEA_VERSION=v1
 ```
