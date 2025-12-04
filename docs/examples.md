@@ -17,7 +17,7 @@ rightbar: true
 'zaimea' => [
     'client_id' => env('ZAIMEA_CLIENT_ID'),
     'client_secret' => env('ZAIMEA_CLIENT_SECRET'),
-    'redirect' => env('ZAIMEA_REDIRECT', 'http://zaimea.com/auth/callback'),
+    'redirect' => env('ZAIMEA_REDIRECT_URI', 'http://zaimea.com/auth/callback'),
     'version' => env('ZAIMEA_VERSION', 'v1'),
 ],
 ```
