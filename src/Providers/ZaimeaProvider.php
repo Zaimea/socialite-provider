@@ -3,6 +3,7 @@
 namespace Zaimea\Socialite\Providers;
 
 use GuzzleHttp\RequestOptions;
+use Illuminate\Support\Facades\Http;
 use Laravel\Socialite\Two\AbstractProvider;
 use Laravel\Socialite\Two\ProviderInterface;
 use Laravel\Socialite\Two\User;
@@ -10,11 +11,21 @@ use Laravel\Socialite\Two\User;
 class ZaimeaProvider extends AbstractProvider implements ProviderInterface
 {
     /**
+     * The separating character for the requested scopes.
+     *
+     * @var string
+     */
+    protected $scopeSeparator = ' ';
+
+    /**
      * The scopes being requested.
      *
      * @var array
      */
-    protected $scopes = ['user'];
+    protected $scopes = [
+        'user',
+        'group',
+    ];
 
     /**
      * {@inheritdoc}
@@ -76,5 +87,47 @@ class ZaimeaProvider extends AbstractProvider implements ProviderInterface
                 'Authorization' => 'Bearer '. $token,
             ],
         ];
+    }
+
+    /**
+     * Refresh the access token using refresh token
+     *
+     * @param  string  $refreshToken
+     * @return array
+     * @throws \Exception
+     */
+    public function refreshAccessToken(string $refreshToken): array
+    {
+        $response = Http::asForm()->post($this->getTokenUrl(), [
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $refreshToken,
+            'client_id' => $this->clientId,
+            'client_secret' => $this->clientSecret,
+        ]);
+
+        if (!$response->successful()) {
+            throw new \Exception('Failed to refresh token: ' . $response->body());
+        }
+
+        return $response->json();
+    }
+
+    /**
+     * Verify if token is still valid
+     *
+     * @param  string  $token
+     * @return bool
+     */
+    public function verifyToken(string $token): bool
+    {
+        try {
+            $response = Http::withToken($token)
+                ->timeout(5)
+                ->get('https://accounts.zaimea.com/api/v1/auth/user');
+
+            return $response->successful();
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }
