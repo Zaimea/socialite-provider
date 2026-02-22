@@ -23,8 +23,7 @@ class ZaimeaProvider extends AbstractProvider implements ProviderInterface
      * @var array
      */
     protected $scopes = [
-        'user',
-        'group',
+        'user:read',
     ];
 
     /**
